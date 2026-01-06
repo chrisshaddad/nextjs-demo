@@ -4,7 +4,7 @@ import { useState } from "react";
 
 interface FavoriteButtonProps {
   itemId: number;
-  itemType: "book" | "author";
+  itemType: "book" | "author" | "publisher";
 }
 
 export default function FavoriteButton({}: FavoriteButtonProps) {

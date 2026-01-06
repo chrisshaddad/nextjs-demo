@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { delay } from '@/lib/utils';
 import { getAllAuthors, getBooksByAuthorId } from '@/lib/data';
 
-export default function AuthorsPage() {
+export default async function AuthorsPage() {
+  await delay(300); 
+  
   const authors = getAllAuthors();
 
   return (
