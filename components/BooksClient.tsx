@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import SearchBar from './SearchBar';
 import { Book, Author } from '@/lib/data';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 interface BooksClientProps {
   initialBooks: Book[];
@@ -12,8 +13,32 @@ interface BooksClientProps {
 }
 
 export default function BooksClient({ initialBooks, authors }: BooksClientProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState<string>('all');
+  const [itemsToShow, setItemsToShow] = useState(3);
+
+  const itemsPerPage = 3;
+
+  const selectedGenre = searchParams.get('genre') || 'all';
+
+  // Handler to update genre filter via query params
+  const handleGenreChange = (genre: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (genre === 'all') {
+      params.delete('genre');
+    } else {
+      params.set('genre', genre);
+    }
+
+    const queryString = params.toString();
+    const url = queryString ? `${pathname}?${queryString}` : pathname;
+
+    router.push(url);
+  };
 
   // Get unique genres
   const genres = useMemo(() => {
@@ -30,6 +55,18 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
       return matchesSearch && matchesGenre;
     });
   }, [initialBooks, searchQuery, selectedGenre, authors]);
+
+  const displayedBooks = filteredBooks.slice(0, itemsToShow);
+  const hasMoreBooks = filteredBooks.length > itemsToShow;
+
+  // Show 3 more books
+  const handleShowMore = () => {
+    setItemsToShow(prev => prev + itemsPerPage);
+  };
+
+  useEffect(() => {
+    setItemsToShow(itemsPerPage);
+  }, [searchQuery, selectedGenre, itemsPerPage]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -48,7 +85,7 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
           {genres.map((genre) => (
             <button
               key={genre}
-              onClick={() => setSelectedGenre(genre)}
+              onClick={() => handleGenreChange(genre)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 selectedGenre === genre
                   ? 'bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900'
@@ -63,7 +100,7 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
 
       {/* Results count */}
       <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-        Showing {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
+        Showing {displayedBooks.length} of {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
       </p>
       
       {filteredBooks.length === 0 ? (
@@ -73,8 +110,9 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredBooks.map((book) => {
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {displayedBooks.map((book) => {
             const author = authors.find(a => a.id === book.authorId);
             
             return (
@@ -108,7 +146,18 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
               </Link>
             );
           })}
-        </div>
+          </div>
+          {hasMoreBooks && (
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={handleShowMore}
+                className="px-6 py-3 bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900 rounded-lg font-medium hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
+              >
+                Show More
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

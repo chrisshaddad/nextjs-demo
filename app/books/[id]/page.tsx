@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getBookById, getAuthorById, getBooksByAuthorId } from '@/lib/data';
+
 import FavoriteButton from '@/components/FavoriteButton';
+import { getBookById, getAuthorById, getBooksByAuthorId } from '@/lib/data';
 
 export default async function BookPage({
   params,
