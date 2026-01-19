@@ -1,6 +1,3 @@
-// In-memory data for the demo
-// This is the singleton pattern we spoke about :)
-
 export interface Author {
   id: number;
   name: string;
@@ -10,10 +7,20 @@ export interface Author {
   imageUrl: string;
 }
 
+export interface Publisher {
+  id: number;
+  name: string;
+  country: string;
+  foundedYear: number;
+  description: string;
+  logoUrl: string;
+}
+
 export interface Book {
   id: number;
   title: string;
   authorId: number;
+  publisherId: number;
   publishedYear: number;
   genre: string;
   description: string;
@@ -70,11 +77,51 @@ export const authors: Author[] = [
   },
 ];
 
+export const publishers: Publisher[] = [
+  {
+    id: 1,
+    name: "Penguin Random House",
+    country: "United States",
+    foundedYear: 2013,
+    description:
+      "Penguin Random House is the world's largest trade book publisher, known for its diverse range of books across all genres.",
+    logoUrl:
+      "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=200&h=200&fit=crop",
+  },
+  {
+    id: 2,
+    name: "HarperCollins",
+    country: "United States",
+    foundedYear: 1989,
+    description:
+      "HarperCollins is a leading global publisher with a rich history of publishing some of the world's most beloved authors and titles.",
+    logoUrl: "https://images.unsplash.com/photo-1529612700005-e35377bf1415?w=200&h=200&fit=crop",
+  },
+  {
+    id: 3,
+    name: "Simon & Schuster",
+    country: "United States",
+    foundedYear: 1924,
+    description:
+      "Simon & Schuster is a major publishing company known for its wide array of fiction and non-fiction titles across various genres.",
+    logoUrl: "https://images.unsplash.com/photo-1581090700227-1e37b190418e?w=200&h=200&fit=crop",
+  },
+  {
+    id: 4,
+    name: "Hachette Livre",
+    country: "France",
+    foundedYear: 1826,
+    description: "Hachette Livre is a leading French publishing company with a strong international presence, publishing a wide range of books in various genres.",
+    logoUrl: "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=200&h=200&fit=crop",
+  }
+]
+
 export const books: Book[] = [
   {
     id: 1,
     title: "Pride and Prejudice",
     authorId: 1,
+    publisherId: 1,
     publishedYear: 1813,
     genre: "Romance",
     description:
@@ -88,6 +135,7 @@ export const books: Book[] = [
     id: 2,
     title: "Emma",
     authorId: 1,
+    publisherId: 1,
     publishedYear: 1815,
     genre: "Romance",
     description:
@@ -101,6 +149,7 @@ export const books: Book[] = [
     id: 3,
     title: "1984",
     authorId: 2,
+    publisherId: 2,
     publishedYear: 1949,
     genre: "Dystopian Fiction",
     description:
@@ -114,6 +163,7 @@ export const books: Book[] = [
     id: 4,
     title: "Animal Farm",
     authorId: 2,
+    publisherId: 2,
     publishedYear: 1945,
     genre: "Political Satire",
     description:
@@ -127,6 +177,7 @@ export const books: Book[] = [
     id: 5,
     title: "Murder on the Orient Express",
     authorId: 3,
+    publisherId: 3,
     publishedYear: 1934,
     genre: "Mystery",
     description:
@@ -140,6 +191,7 @@ export const books: Book[] = [
     id: 6,
     title: "And Then There Were None",
     authorId: 3,
+    publisherId: 3,
     publishedYear: 1939,
     genre: "Mystery",
     description:
@@ -153,6 +205,7 @@ export const books: Book[] = [
     id: 7,
     title: "The Old Man and the Sea",
     authorId: 4,
+    publisherId: 2,
     publishedYear: 1952,
     genre: "Literary Fiction",
     description:
@@ -166,6 +219,7 @@ export const books: Book[] = [
     id: 8,
     title: "A Farewell to Arms",
     authorId: 4,
+    publisherId: 4,
     publishedYear: 1929,
     genre: "War Novel",
     description:
@@ -179,6 +233,7 @@ export const books: Book[] = [
     id: 9,
     title: "Mrs Dalloway",
     authorId: 5,
+    publisherId: 2,
     publishedYear: 1925,
     genre: "Modernist Literature",
     description:
@@ -192,6 +247,7 @@ export const books: Book[] = [
     id: 10,
     title: "To the Lighthouse",
     authorId: 5,
+    publisherId: 1,
     publishedYear: 1927,
     genre: "Modernist Literature",
     description:
@@ -222,4 +278,16 @@ export function getAllAuthors(): Author[] {
 
 export function getAllBooks(): Book[] {
   return books;
+}
+
+export function getPublisherById(id: number): Publisher | undefined {
+  return publishers.find((publisher) => publisher.id === id);
+}
+
+export function getBooksByPublisherId(publisherId: number): Book[] {
+  return books.filter((book) => book.publisherId === publisherId);
+}
+
+export function getAllPublishers(): Publisher[] {
+  return publishers;
 }
