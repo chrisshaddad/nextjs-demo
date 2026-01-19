@@ -3,33 +3,51 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getBookById, getAuthorById, getBooksByAuthorId } from '@/lib/data';
 import FavoriteButton from '@/components/FavoriteButton';
+import { sleep } from '@/lib/sleep';
+
+type SearchParams = {
+  page?: string;
+};
+
+const PAGE_SIZE = 5;
 
 export default async function BookPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: SearchParams;
 }) {
+
+  await sleep(400);
   const { id } = await params;
+  const { page } = searchParams;
   const book = getBookById(parseInt(id));
-  
+
   if (!book) {
     notFound();
   }
-  
+
   const author = getAuthorById(book.authorId);
   const otherBooksByAuthor = getBooksByAuthorId(book.authorId).filter(
     b => b.id !== book.id
   );
 
+  const currentPage = Math.max(1, parseInt(page ?? '1', 10) || 1);
+  const totalPages = Math.max(1, Math.ceil(otherBooksByAuthor.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+
+  const startIndex = (safePage - 1) * PAGE_SIZE;
+  const paginatedOtherBooks = otherBooksByAuthor.slice(startIndex, startIndex + PAGE_SIZE);
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Link 
-        href="/books" 
+      <Link
+        href="/books"
         className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 mb-6 inline-block"
       >
         ← Back to Books
       </Link>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6">
         {/* Book Cover */}
         <div className="md:col-span-1">
@@ -43,24 +61,24 @@ export default async function BookPage({
             />
           </div>
         </div>
-        
+
         {/* Book Details */}
         <div className="md:col-span-2">
           <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
             {book.title}
           </h1>
-          
-          <Link 
+
+          <Link
             href={`/authors/${author?.id}`}
             className="text-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 mb-4 inline-block"
           >
             by {author?.name}
           </Link>
-          
+
           <div className="mb-6">
             <FavoriteButton itemId={book.id} itemType="book" />
           </div>
-          
+
           <div className="flex flex-wrap gap-4 mb-6">
             <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2 rounded-lg">
               <span className="text-sm text-zinc-600 dark:text-zinc-400">Genre:</span>
@@ -81,7 +99,7 @@ export default async function BookPage({
               </span>
             </div>
           </div>
-          
+
           <div className="mb-6">
             <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50 mb-3">
               About this book
@@ -90,7 +108,7 @@ export default async function BookPage({
               {book.description}
             </p>
           </div>
-          
+
           <div className="bg-zinc-100 dark:bg-zinc-800 p-4 rounded-lg">
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
               ISBN: <span className="font-mono text-zinc-900 dark:text-zinc-50">{book.isbn}</span>
@@ -98,7 +116,7 @@ export default async function BookPage({
           </div>
         </div>
       </div>
-      
+
       {/* Other Books by Author */}
       {otherBooksByAuthor.length > 0 && (
         <div className="mt-16">
@@ -106,7 +124,7 @@ export default async function BookPage({
             More by {author?.name}
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {otherBooksByAuthor.map((otherBook) => (
+            {paginatedOtherBooks.map((otherBook) => (
               <Link
                 key={otherBook.id}
                 href={`/books/${otherBook.id}`}
@@ -128,6 +146,30 @@ export default async function BookPage({
                 </p>
               </Link>
             ))}
+          </div>
+          <div className="flex items-center justify-between mt-10">
+            <Link
+              href={`/books/${book.id}?page=${safePage - 1}`}
+              aria-disabled={safePage <= 1}
+              className={`px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 ${safePage <= 1 ? 'opacity-50 pointer-events-none' : 'hover:bg-zinc-50 dark:hover:bg-zinc-900'
+                }`}
+            >
+              ← Prev
+            </Link>
+
+            <div className="text-sm text-zinc-600 dark:text-zinc-400">
+              Page <span className="font-semibold">{safePage}</span> of{' '}
+              <span className="font-semibold">{totalPages}</span>
+            </div>
+
+            <Link
+              href={`/books/${book.id}?page=${safePage + 1}`}
+              aria-disabled={safePage >= totalPages}
+              className={`px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 ${safePage >= totalPages ? 'opacity-50 pointer-events-none' : 'hover:bg-zinc-50 dark:hover:bg-zinc-900'
+                }`}
+            >
+              Next →
+            </Link>
           </div>
         </div>
       )}
