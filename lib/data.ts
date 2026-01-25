@@ -20,6 +20,16 @@ export interface Book {
   coverUrl: string;
   pages: number;
   isbn: string;
+  publisherId: number;
+}
+
+export interface Publisher {
+  id: number;
+  name: string;
+  country: string;
+  foundedYear: number;
+  description: string;
+  website: string;
 }
 
 export const authors: Author[] = [
@@ -70,11 +80,135 @@ export const authors: Author[] = [
   },
 ];
 
+export const publishers: Publisher[] = [
+  {
+    id: 1,
+    name: "Penguin Classics",
+    country: "United Kingdom",
+    foundedYear: 1946,
+    description: "Penguin Classics is a series of the most important books of world literature, with covers designed by the Coralie Bickford-Smith.",
+    website: "www.penguin.co.uk"
+  },
+  {
+    id: 2,
+    name: "Oxford University Press",
+    country: "United Kingdom",
+    foundedYear: 1586,
+    description: "Oxford University Press is the university press of the University of Oxford. It is the largest university press in the world.",
+    website: "www.oup.com"
+  },
+  {
+    id: 3,
+    name: "Vintage Books",
+    country: "United States",
+    foundedYear: 1954,
+    description: "Vintage Books is an imprint of Random House that publishes trade paperback reprints of classic fiction and non-fiction.",
+    website: "www.vintagebooks.com"
+  },
+  {
+    id: 4,
+    name: "Scribner",
+    country: "United States",
+    foundedYear: 1846,
+    description: "Scribner is an American publisher known for publishing classic literature and contemporary fiction.",
+    website: "www.scribner.com"
+  },
+  {
+    id: 5,
+    name: "Bloomsbury",
+    country: "United Kingdom",
+    foundedYear: 1986,
+    description: "Bloomsbury Publishing is an independent, award-winning publisher of fiction and non-fiction from around the world.",
+    website: "www.bloomsbury.com"
+  },
+  {
+    id: 6,
+    name: "HarperCollins",
+    country: "United States",
+    foundedYear: 1817,
+    description: "HarperCollins is one of the largest publishing companies in the world, publishing a wide range of literary fiction, non-fiction, and more.",
+    website: "www.harpercollins.com"
+  },
+  {
+    id: 7,
+    name: "Simon & Schuster",
+    country: "United States",
+    foundedYear: 1924,
+    description: "Simon & Schuster is one of the largest book publishers in the United States, known for publishing bestselling authors across all genres.",
+    website: "www.simonandschuster.com"
+  },
+  {
+    id: 8,
+    name: "Gallimard",
+    country: "France",
+    foundedYear: 1911,
+    description: "Gallimard is one of the most famous French publishing houses, renowned for publishing important literary works.",
+    website: "www.gallimard.fr"
+  },
+  {
+    id: 9,
+    name: "Doubleday",
+    country: "United States",
+    foundedYear: 1897,
+    description: "Doubleday is one of the oldest and most prestigious publishing houses in the United States, part of Penguin Random House.",
+    website: "www.doubleday.com"
+  },
+  {
+    id: 10,
+    name: "Farrar, Straus and Giroux",
+    country: "United States",
+    foundedYear: 1946,
+    description: "Farrar, Straus and Giroux is an American book publisher known for publishing acclaimed literary fiction and serious non-fiction.",
+    website: "www.fsgbooks.com"
+  },
+  {
+    id: 11,
+    name: "Penguin Books",
+    country: "United Kingdom",
+    foundedYear: 1935,
+    description: "Penguin Books is a British publishing house known for introducing affordable paperback editions of classic literature.",
+    website: "www.penguin.co.uk"
+  },
+  {
+    id: 12,
+    name: "Crown Publishing",
+    country: "United States",
+    foundedYear: 1933,
+    description: "Crown Publishing Group is a division of Penguin Random House that publishes fiction, non-fiction, and illustrated works.",
+    website: "www.crownpublishing.com"
+  },
+  {
+    id: 13,
+    name: "W.W. Norton",
+    country: "United States",
+    foundedYear: 1923,
+    description: "W.W. Norton & Company is an independent American book publisher known for quality literary works and textbooks.",
+    website: "www.wwnorton.com"
+  },
+  {
+    id: 14,
+    name: "Knopf",
+    country: "United States",
+    foundedYear: 1915,
+    description: "Alfred A. Knopf is a prestigious American publisher known for publishing important literary fiction and non-fiction.",
+    website: "www.knopfdoubleday.com"
+  },
+  {
+    id: 15,
+    name: "Macmillan",
+    country: "United Kingdom",
+    foundedYear: 1843,
+    description: "Macmillan Publishers is a British publishing house with a global presence, publishing books across all major genres.",
+    website: "www.macmillan.com"
+  }
+];
+
 export const books: Book[] = [
   {
     id: 1,
     title: "Pride and Prejudice",
     authorId: 1,
+    publisherId: 1,
     publishedYear: 1813,
     genre: "Romance",
     description:
@@ -88,6 +222,7 @@ export const books: Book[] = [
     id: 2,
     title: "Emma",
     authorId: 1,
+    publisherId: 1,
     publishedYear: 1815,
     genre: "Romance",
     description:
@@ -101,6 +236,7 @@ export const books: Book[] = [
     id: 3,
     title: "1984",
     authorId: 2,
+    publisherId: 3,
     publishedYear: 1949,
     genre: "Dystopian Fiction",
     description:
@@ -114,6 +250,7 @@ export const books: Book[] = [
     id: 4,
     title: "Animal Farm",
     authorId: 2,
+    publisherId: 2,
     publishedYear: 1945,
     genre: "Political Satire",
     description:
@@ -127,6 +264,7 @@ export const books: Book[] = [
     id: 5,
     title: "Murder on the Orient Express",
     authorId: 3,
+    publisherId: 5,
     publishedYear: 1934,
     genre: "Mystery",
     description:
@@ -140,6 +278,7 @@ export const books: Book[] = [
     id: 6,
     title: "And Then There Were None",
     authorId: 3,
+    publisherId: 5,
     publishedYear: 1939,
     genre: "Mystery",
     description:
@@ -153,6 +292,7 @@ export const books: Book[] = [
     id: 7,
     title: "The Old Man and the Sea",
     authorId: 4,
+    publisherId: 4,
     publishedYear: 1952,
     genre: "Literary Fiction",
     description:
@@ -166,6 +306,7 @@ export const books: Book[] = [
     id: 8,
     title: "A Farewell to Arms",
     authorId: 4,
+    publisherId: 4,
     publishedYear: 1929,
     genre: "War Novel",
     description:
@@ -179,6 +320,7 @@ export const books: Book[] = [
     id: 9,
     title: "Mrs Dalloway",
     authorId: 5,
+    publisherId: 2,
     publishedYear: 1925,
     genre: "Modernist Literature",
     description:
@@ -192,6 +334,7 @@ export const books: Book[] = [
     id: 10,
     title: "To the Lighthouse",
     authorId: 5,
+    publisherId: 2,
     publishedYear: 1927,
     genre: "Modernist Literature",
     description:
@@ -222,4 +365,16 @@ export function getAllAuthors(): Author[] {
 
 export function getAllBooks(): Book[] {
   return books;
+}
+
+export function getPublisherById(id: number): Publisher | undefined {
+  return publishers.find((publisher) => publisher.id === id);
+}
+
+export function getBooksByPublisherId(publisherId: number): Book[] {
+  return books.filter((book) => book.publisherId === publisherId);
+}
+
+export function getAllPublishers(): Publisher[] {
+  return publishers;
 }
