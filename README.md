@@ -26,6 +26,8 @@ Access the application at `http://localhost:3000`.
 
 ### What you need to do
 
+### V1 Changes
+
 1. Switch books genre filtering from `useState` to query params.
 2. Add pagination to the different listings available.
 3. Add new pages for publishers:
