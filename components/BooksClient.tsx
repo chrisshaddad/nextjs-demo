@@ -5,31 +5,67 @@ import Link from 'next/link';
 import Image from 'next/image';
 import SearchBar from './SearchBar';
 import { Book, Author } from '@/lib/data';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 interface BooksClientProps {
   initialBooks: Book[];
   authors: Author[];
+  currentPage: number;
+  totalPages: number;
 }
 
-export default function BooksClient({ initialBooks, authors }: BooksClientProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState<string>('all');
+export default function BooksClient({ initialBooks, authors ,currentPage , totalPages}: BooksClientProps) {
+    const [searchQuery, setSearchQuery] = useState('');
+  //const [selectedGenre, setSelectedGenre] = useState<string>('all');
 
-  // Get unique genres
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+    const selectedGenre = searchParams.get('genre') || 'all';
+
+    // Get unique genres
   const genres = useMemo(() => {
     const genreSet = new Set(initialBooks.map(book => book.genre));
     return ['all', ...Array.from(genreSet)];
   }, [initialBooks]);
 
-  // Filter books based on search and genre
+    // Filter books based on search and genre
   const filteredBooks = useMemo(() => {
     return initialBooks.filter(book => {
-      const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           authors.find(a => a.id === book.authorId)?.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch =
+        book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        authors.find(a => a.id === book.authorId)?.name.toLowerCase().includes(searchQuery.toLowerCase());
+
       const matchesGenre = selectedGenre === 'all' || book.genre === selectedGenre;
       return matchesSearch && matchesGenre;
     });
   }, [initialBooks, searchQuery, selectedGenre, authors]);
+
+
+  const handleGenreChange = (genre: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (genre === 'all') {
+      params.delete('genre');
+    } else {
+      params.set('genre', genre);
+    }
+
+    const queryString = params.toString();
+    router.push(queryString ? `${pathname}?${queryString}` : pathname);
+  };
+const buildPageUrl = (page: number) => {
+  const params = new URLSearchParams(searchParams.toString());
+
+  if (page <= 1) {
+    params.delete('page');
+  } else {
+    params.set('page', String(page));
+  }
+
+  const query = params.toString();
+  return query ? `${pathname}?${query}` : pathname;
+};
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -48,8 +84,8 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
           {genres.map((genre) => (
             <button
               key={genre}
-              onClick={() => setSelectedGenre(genre)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                onClick={() => handleGenreChange(genre)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 selectedGenre === genre
                   ? 'bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900'
                   : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
@@ -110,6 +146,29 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
           })}
         </div>
       )}
+<div className="flex justify-center items-center gap-6 mt-10 text-sm text-zinc-600 dark:text-zinc-400">
+  {currentPage > 1 && (
+    <Link
+      href={buildPageUrl(currentPage - 1)}
+      className="hover:text-zinc-900 dark:hover:text-zinc-50"
+    >
+      Previous
+    </Link>
+  )}
+
+  <span>
+    {currentPage} / {totalPages}
+  </span>
+
+  {currentPage < totalPages && (
+    <Link
+      href={buildPageUrl(currentPage + 1)}
+      className="hover:text-zinc-900 dark:hover:text-zinc-50"
+    >
+      Next
+    </Link>
+  )}
+</div>
     </div>
   );
 }
