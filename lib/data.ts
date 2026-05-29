@@ -14,6 +14,7 @@ export interface Book {
   id: number;
   title: string;
   authorId: number;
+  publisherId: number;
   publishedYear: number;
   genre: string;
   description: string;
@@ -21,6 +22,17 @@ export interface Book {
   pages: number;
   isbn: string;
 }
+
+export interface Publisher {
+  id: number;
+  name: string;
+  country: string;
+  foundedYear: number;
+  description: string;
+  logoUrl: string;
+  website: string;
+}
+
 
 export const authors: Author[] = [
   {
@@ -31,6 +43,7 @@ export const authors: Author[] = [
     nationality: "British",
     imageUrl:
       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop",
+      
   },
   {
     id: 2,
@@ -83,6 +96,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop",
     pages: 432,
     isbn: "978-0141439518",
+    publisherId: 1, 
   },
   {
     id: 2,
@@ -96,6 +110,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=600&fit=crop",
     pages: 474,
     isbn: "978-0141439587",
+    publisherId: 1, 
   },
   {
     id: 3,
@@ -109,6 +124,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=600&fit=crop",
     pages: 328,
     isbn: "978-0452284234",
+    publisherId: 2,
   },
   {
     id: 4,
@@ -122,6 +138,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=400&h=600&fit=crop",
     pages: 112,
     isbn: "978-0452284244",
+    publisherId: 2,
   },
   {
     id: 5,
@@ -135,6 +152,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=600&fit=crop",
     pages: 256,
     isbn: "978-0062693662",
+    publisherId: 2,
   },
   {
     id: 6,
@@ -148,6 +166,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=400&h=600&fit=crop",
     pages: 272,
     isbn: "978-0062073488",
+    publisherId: 2,
   },
   {
     id: 7,
@@ -161,6 +180,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=400&h=600&fit=crop",
     pages: 127,
     isbn: "978-0684801223",
+    publisherId: 2,
   },
   {
     id: 8,
@@ -174,6 +194,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop",
     pages: 332,
     isbn: "978-0684801469",
+    publisherId: 3,
   },
   {
     id: 9,
@@ -187,6 +208,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=600&fit=crop",
     pages: 194,
     isbn: "978-0156628709",
+     publisherId: 3,
   },
   {
     id: 10,
@@ -200,8 +222,49 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&h=600&fit=crop",
     pages: 209,
     isbn: "978-0156907392",
+     publisherId: 4,
   },
 ];
+
+export const publishers: Publisher[] = [
+  {
+    id: 1,
+    name: "Riverstone Press",
+    country: "United States",
+    foundedYear: 1978,
+    description: "An independent publisher focused on timeless fiction and modern classics.",
+    logoUrl: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=300&h=300&fit=crop",
+    website: "https://example.com/riverstone",
+  },
+  {
+    id: 2,
+    name: "Silverleaf Publishing",
+    country: "United Kingdom",
+    foundedYear: 1952,
+    description: "A literary house specializing in mystery, satire, and historical works.",
+    logoUrl: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=300&h=300&fit=crop",
+    website: "https://example.com/silverleaf",
+  },
+  {
+    id: 3,
+    name: "Sunrise House",
+    country: "Canada",
+    foundedYear: 1991,
+    description: "A modern publisher bringing curated reads to a global audience.",
+    logoUrl: "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=300&h=300&fit=crop",
+    website: "https://example.com/sunrise",
+  },
+  {
+    id: 4,
+    name: "Mariner & Co.",
+    country: "United States",
+    foundedYear: 1930,
+    description: "Known for literary fiction and award-winning authors.",
+    logoUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=300&h=300&fit=crop",
+    website: "https://example.com/mariner",
+  },
+];
+
 
 // Helper functions
 export function getAuthorById(id: number): Author | undefined {
@@ -222,4 +285,16 @@ export function getAllAuthors(): Author[] {
 
 export function getAllBooks(): Book[] {
   return books;
+}
+
+export function getPublisherById(id: number): Publisher | undefined {
+  return publishers.find((p) => p.id === id);
+}
+
+export function getAllPublishers(): Publisher[] {
+  return publishers;
+}
+
+export function getBooksByPublisherId(publisherId: number): Book[] {
+  return books.filter((b) => b.publisherId === publisherId);
 }
