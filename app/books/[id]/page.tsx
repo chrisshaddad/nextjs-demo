@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getBookById, getAuthorById, getBooksByAuthorId } from '@/lib/data';
+import { delay } from '@/lib/delay';
 import FavoriteButton from '@/components/FavoriteButton';
 
 export default async function BookPage({
@@ -10,6 +11,7 @@ export default async function BookPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await delay();
   const book = getBookById(parseInt(id));
   
   if (!book) {

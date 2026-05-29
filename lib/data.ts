@@ -1,6 +1,15 @@
 // In-memory data for the demo
 // This is the singleton pattern we spoke about :)
 
+export interface Publisher {
+  id: number;
+  name: string;
+  country: string;
+  foundedYear: number;
+  description: string;
+  website: string;
+}
+
 export interface Author {
   id: number;
   name: string;
@@ -14,6 +23,7 @@ export interface Book {
   id: number;
   title: string;
   authorId: number;
+  publisherId: number;
   publishedYear: number;
   genre: string;
   description: string;
@@ -21,6 +31,54 @@ export interface Book {
   pages: number;
   isbn: string;
 }
+
+export const publishers: Publisher[] = [
+  {
+    id: 1,
+    name: "Penguin Books",
+    country: "UK",
+    foundedYear: 1935,
+    description:
+      "Penguin Books is a British publishing house. It was co-founded in 1935 by Allen Lane with his brothers Richard and John, as a line of Bodley Head, and became an independent publishing house in 1936. Penguin revolutionised publishing in the 1930s through its high quality, inexpensive paperbacks.",
+    website: "https://www.penguin.co.uk",
+  },
+  {
+    id: 2,
+    name: "Oxford University Press",
+    country: "UK",
+    foundedYear: 1586,
+    description:
+      "Oxford University Press is the publishing house of the University of Oxford. It is the largest university press in the world and one of the oldest, having been founded in 1586. It publishes more than 6,000 new publications a year across a wide variety of academic, educational, and general interest titles.",
+    website: "https://global.oup.com",
+  },
+  {
+    id: 3,
+    name: "HarperCollins",
+    country: "USA",
+    foundedYear: 1989,
+    description:
+      "HarperCollins Publishers is one of the world's largest publishing companies. Headquartered in New York City, the company is a subsidiary of News Corp. Its origins trace back to 1817 when it was founded as J. and J. Harper in New York, and it has grown through numerous mergers and acquisitions to become a global publishing giant.",
+    website: "https://www.harpercollins.com",
+  },
+  {
+    id: 4,
+    name: "Scribner",
+    country: "USA",
+    foundedYear: 1846,
+    description:
+      "Scribner is an American publisher based in New York City. It is a subsidiary of Simon & Schuster. Founded in 1846 as Baker & Scribner, the company has published works by some of the most important American literary figures including Ernest Hemingway, F. Scott Fitzgerald, and Thomas Wolfe.",
+    website: "https://www.simonandschuster.com/imprint/scribner",
+  },
+  {
+    id: 5,
+    name: "Harcourt",
+    country: "USA",
+    foundedYear: 1919,
+    description:
+      "Harcourt was an American publishing company founded in 1919 by Alfred Harcourt and Donald Brace as Harcourt, Brace & Howe. The company published many notable literary works throughout the 20th century, including major titles by Virginia Woolf, T.S. Eliot, and Sinclair Lewis.",
+    website: "https://www.harcourt.com",
+  },
+];
 
 export const authors: Author[] = [
   {
@@ -75,6 +133,7 @@ export const books: Book[] = [
     id: 1,
     title: "Pride and Prejudice",
     authorId: 1,
+    publisherId: 1,
     publishedYear: 1813,
     genre: "Romance",
     description:
@@ -88,6 +147,7 @@ export const books: Book[] = [
     id: 2,
     title: "Emma",
     authorId: 1,
+    publisherId: 2,
     publishedYear: 1815,
     genre: "Romance",
     description:
@@ -101,6 +161,7 @@ export const books: Book[] = [
     id: 3,
     title: "1984",
     authorId: 2,
+    publisherId: 1,
     publishedYear: 1949,
     genre: "Dystopian Fiction",
     description:
@@ -114,6 +175,7 @@ export const books: Book[] = [
     id: 4,
     title: "Animal Farm",
     authorId: 2,
+    publisherId: 2,
     publishedYear: 1945,
     genre: "Political Satire",
     description:
@@ -127,6 +189,7 @@ export const books: Book[] = [
     id: 5,
     title: "Murder on the Orient Express",
     authorId: 3,
+    publisherId: 3,
     publishedYear: 1934,
     genre: "Mystery",
     description:
@@ -140,6 +203,7 @@ export const books: Book[] = [
     id: 6,
     title: "And Then There Were None",
     authorId: 3,
+    publisherId: 3,
     publishedYear: 1939,
     genre: "Mystery",
     description:
@@ -153,6 +217,7 @@ export const books: Book[] = [
     id: 7,
     title: "The Old Man and the Sea",
     authorId: 4,
+    publisherId: 4,
     publishedYear: 1952,
     genre: "Literary Fiction",
     description:
@@ -166,6 +231,7 @@ export const books: Book[] = [
     id: 8,
     title: "A Farewell to Arms",
     authorId: 4,
+    publisherId: 4,
     publishedYear: 1929,
     genre: "War Novel",
     description:
@@ -179,6 +245,7 @@ export const books: Book[] = [
     id: 9,
     title: "Mrs Dalloway",
     authorId: 5,
+    publisherId: 5,
     publishedYear: 1925,
     genre: "Modernist Literature",
     description:
@@ -192,6 +259,7 @@ export const books: Book[] = [
     id: 10,
     title: "To the Lighthouse",
     authorId: 5,
+    publisherId: 5,
     publishedYear: 1927,
     genre: "Modernist Literature",
     description:
@@ -222,4 +290,16 @@ export function getAllAuthors(): Author[] {
 
 export function getAllBooks(): Book[] {
   return books;
+}
+
+export function getAllPublishers(): Publisher[] {
+  return publishers;
+}
+
+export function getPublisherById(id: number): Publisher | undefined {
+  return publishers.find((publisher) => publisher.id === id);
+}
+
+export function getBooksByPublisherId(publisherId: number): Book[] {
+  return books.filter((book) => book.publisherId === publisherId);
 }

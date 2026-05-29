@@ -1,10 +1,14 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import SearchBar from './SearchBar';
+import Pagination from './Pagination';
 import { Book, Author } from '@/lib/data';
+
+const PAGE_SIZE = 6;
 
 interface BooksClientProps {
   initialBooks: Book[];
@@ -12,8 +16,33 @@ interface BooksClientProps {
 }
 
 export default function BooksClient({ initialBooks, authors }: BooksClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState<string>('all');
+  const selectedGenre = searchParams.get('genre') ?? 'all';
+
+  const page = Math.max(1, Number(searchParams.get('page') ?? '1'));
+
+  const setSelectedGenre = (genre: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('page');
+    if (genre === 'all') {
+      params.delete('genre');
+    } else {
+      params.set('genre', genre);
+    }
+    router.push(`?${params.toString()}`);
+  };
+
+  const buildHref = (p: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (p === 1) {
+      params.delete('page');
+    } else {
+      params.set('page', String(p));
+    }
+    return `?${params.toString()}`;
+  };
 
   // Get unique genres
   const genres = useMemo(() => {
@@ -30,6 +59,10 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
       return matchesSearch && matchesGenre;
     });
   }, [initialBooks, searchQuery, selectedGenre, authors]);
+
+  const totalPages = Math.ceil(filteredBooks.length / PAGE_SIZE);
+  const currentPage = Math.min(page, totalPages || 1);
+  const paginatedBooks = filteredBooks.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -65,7 +98,7 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
       <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
         Showing {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
       </p>
-      
+
       {filteredBooks.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-xl text-zinc-600 dark:text-zinc-400">
@@ -74,7 +107,7 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredBooks.map((book) => {
+          {paginatedBooks.map((book) => {
             const author = authors.find(a => a.id === book.authorId);
             
             return (
@@ -110,6 +143,8 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
           })}
         </div>
       )}
+
+      <Pagination currentPage={currentPage} totalPages={totalPages} buildHref={buildHref} />
     </div>
   );
 }
