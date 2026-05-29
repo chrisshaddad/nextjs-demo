@@ -1,23 +1,41 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { getAllAuthors, getBooksByAuthorId } from '@/lib/data';
+import Pagination from '@/components/Pagination';
 
-export default function AuthorsPage() {
+const PAGE_SIZE = 3;
+
+export default async function AuthorsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
   const authors = getAllAuthors();
+
+  const totalPages = Math.ceil(authors.length / PAGE_SIZE);
+  const currentPage = Math.min(Math.max(1, Number(pageParam ?? '1')), totalPages || 1);
+  const paginatedAuthors = authors.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  const buildHref = (p: number) => (p === 1 ? '/authors' : `/authors?page=${p}`);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-50 mb-8">
         All Authors
       </h1>
-      
+
+      <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+        Showing {authors.length} {authors.length === 1 ? 'author' : 'authors'}
+      </p>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {authors.map((author) => {
+        {paginatedAuthors.map((author) => {
           const bookCount = getBooksByAuthorId(author.id).length;
-          
+
           return (
-            <Link 
-              key={author.id} 
+            <Link
+              key={author.id}
               href={`/authors/${author.id}`}
               className="bg-white dark:bg-zinc-900 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
             >
@@ -40,11 +58,11 @@ export default function AuthorsPage() {
                     </p>
                   </div>
                 </div>
-                
+
                 <p className="text-zinc-700 dark:text-zinc-300 mb-4 line-clamp-3">
                   {author.bio}
                 </p>
-                
+
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-zinc-600 dark:text-zinc-400">
                     Born: {author.birthYear}
@@ -58,6 +76,8 @@ export default function AuthorsPage() {
           );
         })}
       </div>
+
+      <Pagination currentPage={currentPage} totalPages={totalPages} buildHref={buildHref} />
     </div>
   );
 }
