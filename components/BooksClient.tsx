@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import SearchBar from './SearchBar';
@@ -12,8 +13,20 @@ interface BooksClientProps {
 }
 
 export default function BooksClient({ initialBooks, authors }: BooksClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState<string>('all');
+  const selectedGenre = searchParams.get('genre') ?? 'all';
+
+  const setSelectedGenre = (genre: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (genre === 'all') {
+      params.delete('genre');
+    } else {
+      params.set('genre', genre);
+    }
+    router.push(`?${params.toString()}`);
+  };
 
   // Get unique genres
   const genres = useMemo(() => {
