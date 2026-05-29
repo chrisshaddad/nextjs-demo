@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getPublisherById, getBooksByPublisherId, getAuthorById } from '@/lib/data';
+import { delay } from '@/lib/delay';
 
 export default async function PublisherPage({
   params,
@@ -9,6 +10,7 @@ export default async function PublisherPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  await delay();
   const publisher = getPublisherById(parseInt(id));
 
   if (!publisher) {

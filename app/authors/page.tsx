@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { getAllAuthors, getBooksByAuthorId } from '@/lib/data';
+import { delay } from '@/lib/delay';
 import Pagination from '@/components/Pagination';
 
 const PAGE_SIZE = 3;
@@ -11,6 +12,7 @@ export default async function AuthorsPage({
   searchParams: Promise<{ page?: string }>;
 }) {
   const { page: pageParam } = await searchParams;
+  await delay();
   const authors = getAllAuthors();
 
   const totalPages = Math.ceil(authors.length / PAGE_SIZE);
