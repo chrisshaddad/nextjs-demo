@@ -20,6 +20,20 @@ export interface Book {
   coverUrl: string;
   pages: number;
   isbn: string;
+  publisherId: number; // Optional field to link to a publisher
+}
+
+export interface Publisher {
+  id: number;
+  name: string;
+  foundedYear: number;
+  website: string;
+}
+
+export interface User {
+  id: number;
+  email: string;
+  password: string;
 }
 
 export const authors: Author[] = [
@@ -83,6 +97,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop",
     pages: 432,
     isbn: "978-0141439518",
+    publisherId: 1,
   },
   {
     id: 2,
@@ -96,6 +111,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=600&fit=crop",
     pages: 474,
     isbn: "978-0141439587",
+    publisherId: 1,
   },
   {
     id: 3,
@@ -109,6 +125,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=600&fit=crop",
     pages: 328,
     isbn: "978-0452284234",
+    publisherId: 1,
   },
   {
     id: 4,
@@ -122,6 +139,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=400&h=600&fit=crop",
     pages: 112,
     isbn: "978-0452284244",
+    publisherId: 2,
   },
   {
     id: 5,
@@ -135,6 +153,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=600&fit=crop",
     pages: 256,
     isbn: "978-0062693662",
+    publisherId: 3,
   },
   {
     id: 6,
@@ -148,6 +167,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=400&h=600&fit=crop",
     pages: 272,
     isbn: "978-0062073488",
+    publisherId: 3,
   },
   {
     id: 7,
@@ -161,6 +181,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=400&h=600&fit=crop",
     pages: 127,
     isbn: "978-0684801223",
+    publisherId: 2,
   },
   {
     id: 8,
@@ -174,6 +195,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop",
     pages: 332,
     isbn: "978-0684801469",
+    publisherId: 2,
   },
   {
     id: 9,
@@ -187,6 +209,7 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=600&fit=crop",
     pages: 194,
     isbn: "978-0156628709",
+    publisherId: 1,
   },
   {
     id: 10,
@@ -200,6 +223,36 @@ export const books: Book[] = [
       "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&h=600&fit=crop",
     pages: 209,
     isbn: "978-0156907392",
+    publisherId: 3,
+  },
+];
+
+export const publishers: Publisher[] = [
+  {
+    id: 1,
+    name: "Penguin Books",
+    foundedYear: 1935,
+    website: "https://www.penguin.com",
+  },
+  {
+    id: 2,
+    name: "Scribner",
+    foundedYear: 1846,
+    website: "https://www.scribner.com",
+  },
+  {
+    id: 3,
+    name: "Harper & Row",
+    foundedYear: 1957,
+    website: "https://www.harpercollins.com",
+  },
+];
+
+export const users: User[] = [
+  {
+    id: 1,
+    email: "john@example.com",
+    password: "password",
   },
 ];
 
@@ -212,8 +265,20 @@ export function getBookById(id: number): Book | undefined {
   return books.find((book) => book.id === id);
 }
 
+export function getPublisherById(id: number): Publisher | undefined {
+  return publishers.find((publisher) => publisher.id === id);
+}
+
+export function getUserById(id: number): User | undefined {
+  return users.find((user) => user.id === id);
+}
+
 export function getBooksByAuthorId(authorId: number): Book[] {
   return books.filter((book) => book.authorId === authorId);
+}
+
+export function getBooksByPublisherId(publisherId: number): Book[] {
+  return books.filter((book) => book.publisherId === publisherId);
 }
 
 export function getAllAuthors(): Author[] {
@@ -222,4 +287,26 @@ export function getAllAuthors(): Author[] {
 
 export function getAllBooks(): Book[] {
   return books;
+}
+
+export function getAllPublishers(): Publisher[] {
+  return publishers;
+}
+
+export function getAllUsers(): User[] {
+  return users;
+}
+
+export function findUserByEmail(email: string): User | undefined {
+  return users.find((u) => u.email === email);
+}
+
+export function createUser(email: string, password: string): User {
+  const newUser: User = {
+    id: users.length + 1,
+    email,
+    password,
+  };
+  users.push(newUser);
+  return newUser;
 }
