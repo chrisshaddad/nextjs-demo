@@ -1,23 +1,36 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import { getAllAuthors, getBooksByAuthorId } from '@/lib/data';
+import Link from "next/link";
+import Image from "next/image";
+import { getAllAuthors, getBooksByAuthorId } from "@/lib/data";
 
-export default function AuthorsPage() {
+export default async function AuthorsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page } = await searchParams;
   const authors = getAllAuthors();
+
+  const currentPage = Number(page ?? "1");
+  const pageSize = 3;
+  const totalPages = Math.ceil(authors.length / pageSize);
+  const paginatedAuthors = authors.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-50 mb-8">
         All Authors
       </h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {authors.map((author) => {
+        {paginatedAuthors.map((author) => {
           const bookCount = getBooksByAuthorId(author.id).length;
-          
+
           return (
-            <Link 
-              key={author.id} 
+            <Link
+              key={author.id}
               href={`/authors/${author.id}`}
               className="bg-white dark:bg-zinc-900 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
             >
@@ -40,17 +53,17 @@ export default function AuthorsPage() {
                     </p>
                   </div>
                 </div>
-                
+
                 <p className="text-zinc-700 dark:text-zinc-300 mb-4 line-clamp-3">
                   {author.bio}
                 </p>
-                
+
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-zinc-600 dark:text-zinc-400">
                     Born: {author.birthYear}
                   </span>
                   <span className="bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-full text-zinc-700 dark:text-zinc-300">
-                    {bookCount} {bookCount === 1 ? 'book' : 'books'}
+                    {bookCount} {bookCount === 1 ? "book" : "books"}
                   </span>
                 </div>
               </div>
@@ -58,6 +71,28 @@ export default function AuthorsPage() {
           );
         })}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-4 mt-8">
+          <Link
+            href={`/authors?page=${currentPage - 1}`}
+            className={`px-4 py-2 rounded bg-zinc-100 dark:bg-zinc-800 ${currentPage === 1 ? "pointer-events-none opacity-50" : ""}`}
+          >
+            Previous
+          </Link>
+
+          <span className="py-2 text-zinc-600 dark:text-zinc-400">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <Link
+            href={`/authors?page=${currentPage + 1}`}
+            className={`px-4 py-2 rounded bg-zinc-100 dark:bg-zinc-800 ${currentPage === totalPages ? "pointer-events-none opacity-50" : ""}`}
+          >
+            Next
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
