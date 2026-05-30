@@ -1,35 +1,58 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import SearchBar from './SearchBar';
-import { Book, Author } from '@/lib/data';
+import { useState, useMemo } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import SearchBar from "./SearchBar";
+import { Book, Author } from "@/lib/data";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface BooksClientProps {
   initialBooks: Book[];
   authors: Author[];
 }
 
-export default function BooksClient({ initialBooks, authors }: BooksClientProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState<string>('all');
+export default function BooksClient({
+  initialBooks,
+  authors,
+}: BooksClientProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  //const [selectedGenre, setSelectedGenre] = useState<string>('all');
+  const searchParams = useSearchParams();
+  const selectedGenre = searchParams.get("genre") ?? "all";
+
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const currentPage = Number(searchParams.get("page") ?? "1");
+  const pageSize = 4;
 
   // Get unique genres
   const genres = useMemo(() => {
-    const genreSet = new Set(initialBooks.map(book => book.genre));
-    return ['all', ...Array.from(genreSet)];
+    const genreSet = new Set(initialBooks.map((book) => book.genre));
+    return ["all", ...Array.from(genreSet)];
   }, [initialBooks]);
 
   // Filter books based on search and genre
   const filteredBooks = useMemo(() => {
-    return initialBooks.filter(book => {
-      const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           authors.find(a => a.id === book.authorId)?.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesGenre = selectedGenre === 'all' || book.genre === selectedGenre;
+    return initialBooks.filter((book) => {
+      const matchesSearch =
+        book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        authors
+          .find((a) => a.id === book.authorId)
+          ?.name.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+      const matchesGenre =
+        selectedGenre === "all" || book.genre === selectedGenre;
       return matchesSearch && matchesGenre;
     });
   }, [initialBooks, searchQuery, selectedGenre, authors]);
+
+  const totalPages = Math.ceil(filteredBooks.length / pageSize);
+  const paginatedBooks = filteredBooks.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -37,7 +60,7 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
         All Books
       </h1>
 
-      <SearchBar 
+      <SearchBar
         onSearch={setSearchQuery}
         placeholder="Search by title or author..."
       />
@@ -48,14 +71,19 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
           {genres.map((genre) => (
             <button
               key={genre}
-              onClick={() => setSelectedGenre(genre)}
+              onClick={() => {
+                const params = new URLSearchParams(searchParams.toString());
+                params.set("genre", genre);
+                params.set("page", "1"); // Reset to first page on genre change
+                router.push(`${pathname}?${params.toString()}`);
+              }}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 selectedGenre === genre
-                  ? 'bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900'
-                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                  ? "bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900"
+                  : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700"
               }`}
             >
-              {genre === 'all' ? 'All Genres' : genre}
+              {genre === "all" ? "All Genres" : genre}
             </button>
           ))}
         </div>
@@ -63,9 +91,10 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
 
       {/* Results count */}
       <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-        Showing {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
+        Showing {paginatedBooks.length}{" "}
+        {paginatedBooks.length === 1 ? "book" : "books"}
       </p>
-      
+
       {filteredBooks.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-xl text-zinc-600 dark:text-zinc-400">
@@ -74,12 +103,12 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredBooks.map((book) => {
-            const author = authors.find(a => a.id === book.authorId);
-            
+          {paginatedBooks.map((book) => {
+            const author = authors.find((a) => a.id === book.authorId);
+
             return (
-              <Link 
-                key={book.id} 
+              <Link
+                key={book.id}
                 href={`/books/${book.id}`}
                 className="bg-white dark:bg-zinc-900 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
               >
@@ -108,6 +137,38 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
               </Link>
             );
           })}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-4 mt-8">
+          <button
+            onClick={() => {
+              const params = new URLSearchParams(searchParams.toString());
+              params.set("page", String(currentPage - 1));
+              router.push(`${pathname}?${params.toString()}`);
+            }}
+            disabled={currentPage === 1}
+            className="px-4 py-2 rounded bg-zinc-100 dark:bg-zinc-800 disabled:opacity-50"
+          >
+            Previous
+          </button>
+
+          <span className="py-2 text-zinc-600 dark:text-zinc-400">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={() => {
+              const params = new URLSearchParams(searchParams.toString());
+              params.set("page", String(currentPage + 1));
+              router.push(`${pathname}?${params.toString()}`);
+            }}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded bg-zinc-100 dark:bg-zinc-800 disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       )}
     </div>
